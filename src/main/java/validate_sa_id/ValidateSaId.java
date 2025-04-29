@@ -1,20 +1,22 @@
 package validate_sa_id;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
+
 public class ValidateSaId {
 
+    public static boolean isIdNumberValid(String idNumber) {
+        if (!isValidLengthAndDigits(idNumber)) return false;
+        if (!isValidDateOfBirth(idNumber.substring(0, 6))) return false;
+        if (!isValidGenderCode(idNumber.substring(6, 10))) return false;
+        if (!isValidCitizenshipDigit(idNumber.charAt(10))) return false;
+        return isValidLuhnChecksum(idNumber);
+    }
 
-
-        public static boolean isIdNumberValid (String idNumber){
-            if (!isValidLengthAndDigits(idNumber)) return false;
-            if (!isValidDateOfBirth(idNumber.substring(0, 6))) return false;
-            if (!isValidGenderCode(idNumber.substring(6, 10))) return false;
-            if (!isValidCitizenshipDigit(idNumber.charAt(10))) return false;
-            return isValidLuhnChecksum(idNumber);
-        }
-
-        private static boolean isValidLengthAndDigits(String id) {
-            return id != null && id.length() == 13 && id.matches("\\d{13}");
-        }
+    private static boolean isValidLengthAndDigits(String id) {
+        return id != null && id.length() == 13 && id.matches("\\d{13}");
+    }
 
     private static boolean isValidDateOfBirth(String dob) {
         int year = Integer.parseInt(dob.substring(0, 2));
@@ -34,9 +36,8 @@ public class ValidateSaId {
         } catch (Exception e) {
             return false;
         }
-
-
     }
+
     private static boolean isValidGenderCode(String genderCode) {
         int code = Integer.parseInt(genderCode);
         return code >= 0 && code <= 9999;
@@ -62,6 +63,4 @@ public class ValidateSaId {
 
         return sum % 10 == 0;
     }
-    }
-
-
+}
