@@ -34,6 +34,33 @@ public class ValidateSaId {
         } catch (Exception e) {
             return false;
         }
+
+
+    }
+    private static boolean isValidGenderCode(String genderCode) {
+        int code = Integer.parseInt(genderCode);
+        return code >= 0 && code <= 9999;
+    }
+
+    private static boolean isValidCitizenshipDigit(char digit) {
+        return digit == '0' || digit == '1';
+    }
+
+    private static boolean isValidLuhnChecksum(String id) {
+        int sum = 0;
+        boolean alternate = false;
+
+        for (int i = id.length() - 1; i >= 0; i--) {
+            int digit = Character.getNumericValue(id.charAt(i));
+            if (alternate) {
+                digit *= 2;
+                if (digit > 9) digit -= 9;
+            }
+            sum += digit;
+            alternate = !alternate;
+        }
+
+        return sum % 10 == 0;
     }
     }
 
