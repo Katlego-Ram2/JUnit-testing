@@ -12,6 +12,9 @@ public class ValidateSaId {
             return isValidLuhnChecksum(idNumber);
         }
 
+        private static boolean isValidLengthAndDigits(String id) {
+            return id != null && id.length() == 13 && id.matches("\\d{13}");
+        }
     }
 
 
