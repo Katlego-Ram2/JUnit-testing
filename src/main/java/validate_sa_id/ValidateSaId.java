@@ -6,47 +6,70 @@ import java.time.format.ResolverStyle;
 
 public class ValidateSaId {
 
+    // Main ID validation function
     public static boolean isIdNumberValid(String idNumber) {
+        // Check length and digits
         if (!isValidLengthAndDigits(idNumber)) return false;
+        // Validate Date of Birth
         if (!isValidDateOfBirth(idNumber.substring(0, 6))) return false;
         if (!isValidGenderCode(idNumber.substring(6, 10))) return false;
+        // Validate Gender Code
         if (!isValidCitizenshipDigit(idNumber.charAt(10))) return false;
+        // Validate Citizenship Digit
         return isValidLuhnChecksum(idNumber);
+        // Validate Luhn Checksum
     }
 
+    // Validate length and that the ID number only contains digits
     private static boolean isValidLengthAndDigits(String id) {
         return id != null && id.length() == 13 && id.matches("\\d{13}");
     }
 
+    // Validate the Date of Birth part of the ID (first 6 digits)
     private static boolean isValidDateOfBirth(String dob) {
-        int year = Integer.parseInt(dob.substring(0, 2));
-        int month = Integer.parseInt(dob.substring(2, 4));
-        int day = Integer.parseInt(dob.substring(4, 6));
+        try {
+            int year = Integer.parseInt(dob.substring(0, 2));
+            // Extract year
+            int month = Integer.parseInt(dob.substring(2, 4));
+            // Extract month
+            int day = Integer.parseInt(dob.substring(4, 6));
+            // Extract day
 
-        int currentYear = LocalDate.now().getYear() % 100;
-        int fullYear = (year <= currentYear) ? 2000 + year : 1900 + year;
+            // Determine full year (20XX or 19XX)
+            int currentYear = LocalDate.now().getYear() % 100;
+            // Get last two digits of the current year
+            int fullYear = (year <= currentYear) ? 2000 + year : 1900 + year;
 
-        String dateStr = String.format("%04d%02d%02d", fullYear, month, day);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-                .withResolverStyle(ResolverStyle.STRICT);
+            // Ensure that month is valid (1 to 12) and day is valid for that month/year
+            LocalDate date = LocalDate.of(fullYear, month, day);
+            // Parse date to check validity
+
+            return date.getMonthValue() == month && date.getDayOfMonth() == day;
+            // Check if month/day are correct
+        } catch (Exception e) {
+            return false;
+
+        }
+    }
+
+    // Validate gender code (should be a 4-digit number)
+    private static boolean isValidGenderCode(String genderCode) {
 
         try {
-            LocalDate.parse(dateStr, formatter);
-            return true;
-        } catch (Exception e) {
+            int code = Integer.parseInt(genderCode);
+            return code >= 0 && code <= 9999;
+            // Valid gender codes are 0000 to 9999
+        } catch (NumberFormatException e) {
             return false;
         }
     }
 
-    private static boolean isValidGenderCode(String genderCode) {
-        int code = Integer.parseInt(genderCode);
-        return code >= 0 && code <= 9999;
-    }
-
+    // Validate citizenship digit (should be either '0' or '1')
     private static boolean isValidCitizenshipDigit(char digit) {
         return digit == '0' || digit == '1';
     }
 
+    // Validate the Luhn checksum (used to validate the ID number)
     private static boolean isValidLuhnChecksum(String id) {
         int sum = 0;
         boolean alternate = false;
