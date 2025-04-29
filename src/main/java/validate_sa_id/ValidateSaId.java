@@ -2,14 +2,16 @@ package validate_sa_id;
 
 public class ValidateSaId {
 
-    public static boolean isIdNumberValid(String idNumber) {
 
-        //Validation
-        if (idNumber == null || idNumber.length() != 13 || !idNumber.matches("\\d+")) {
-            return false;
+
+        public static boolean isIdNumberValid (String idNumber){
+            if (!isValidLengthAndDigits(idNumber)) return false;
+            if (!isValidDateOfBirth(idNumber.substring(0, 6))) return false;
+            if (!isValidGenderCode(idNumber.substring(6, 10))) return false;
+            if (!isValidCitizenshipDigit(idNumber.charAt(10))) return false;
+            return isValidLuhnChecksum(idNumber);
         }
-        return false;
+
     }
 
-}
 
